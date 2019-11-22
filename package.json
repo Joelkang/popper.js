@@ -8,6 +8,7 @@
   "author": "Federico Zivolo <fzivolo@quid.com>",
   "license": "MIT",
   "repository": "github:popperjs/popper.js",
+  "types": "ts-types/index.d.ts",
   "scripts": {
     "clean": "rimraf lib && rimraf dist && rimraf test/visual/dist",
     "test": "jest --coverage --watch",
@@ -19,6 +20,7 @@
     "build:es": "babel src -d lib --ignore '**/*.test.js','**/__mocks__'",
     "build:bundles": "rollup -c rollup.config.js",
     "build:flow": "flow-copy-source src dist/cjs --ignore '{__mocks__/*,*.test}.js'",
+    "build:ts": "flow-to-ts \"src/**/*.js\" --write; tsc -d \"src/index.ts\" --outFile \"ts-types/\"; rimraf \"src/**/*.ts\"; rimraf \"types/**/*.js\"",
     "precommit": "pretty-quick --staged"
   },
   "files": [
@@ -57,6 +59,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-flow-strip-types": "^7.0.0",
     "@babel/preset-env": "^7.1.5",
+    "@khanacademy/flow-to-ts": "^0.1.4",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "concurrently": "^4.0.1",
@@ -73,6 +76,7 @@
     "rollup-plugin-bundle-size": "^1.0.2",
     "rollup-plugin-replace": "^2.1.0",
     "rollup-plugin-terser": "^3.0.0",
-    "serve": "^10.0.2"
+    "serve": "^10.0.2",
+    "typescript": "^3.7.2"
   }
 }

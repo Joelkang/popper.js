@@ -10,4 +10,5 @@ dist
 package-lock.json
 coverage.info
 lib
+ts-types
 coverage
