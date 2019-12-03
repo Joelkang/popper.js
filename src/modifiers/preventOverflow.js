@@ -10,7 +10,7 @@ import {
   center,
 } from '../enums';
 import type { Tether } from '../enums';
-import type { State, Modifier, Padding } from '../types';
+import type { ModifierArguments, Modifier, Padding } from '../types';
 import getBasePlacement from '../utils/getBasePlacement';
 import getMainAxisFromPlacement from '../utils/getMainAxisFromPlacement';
 import getAltAxis from '../utils/getAltAxis';
@@ -35,18 +35,22 @@ type Options = {
   padding: Padding,
 };
 
-export function preventOverflow(state: State, options?: Options = {}) {
+export function preventOverflow({
+  state,
+  options = {},
+  getModifierData,
+}: ModifierArguments<Options>) {
   const {
     mainAxis: checkMainAxis = true,
     altAxis: checkAltAxis = false,
     tether = center,
     padding = 0,
   } = options;
-  const overflow = state.modifiersData.detectOverflow;
+  const overflow = getModifierData('detectOverflow');
   const basePlacement = getBasePlacement(state.placement);
   const mainAxis = getMainAxisFromPlacement(basePlacement);
   const altAxis = getAltAxis(mainAxis);
-  const popperOffsets = state.modifiersData.popperOffsets;
+  const popperOffsets = getModifierData('popperOffsets');
   const referenceRect = state.measures.reference;
   const popperRect = state.measures.popper;
   const paddingObject = mergePaddingObject(
@@ -74,17 +78,14 @@ export function preventOverflow(state: State, options?: Options = {}) {
         : 0;
 
     const tetherMin =
-      state.modifiersData.popperOffsets[mainAxis] -
-      referenceRect[len] / 2 +
-      additive;
+      popperOffsets[mainAxis] - referenceRect[len] / 2 + additive;
     const tetherMax =
-      state.modifiersData.popperOffsets[mainAxis] +
-      referenceRect[len] / 2 -
-      additive;
+      popperOffsets[mainAxis] + referenceRect[len] / 2 - additive;
 
     const lenCondition =
       referenceRect[len] > popperRect[len] || tether !== surfaces;
 
+    // FIXME: find a proper API to modify these
     state.modifiersData.popperOffsets[mainAxis] = within(
       tether ? Math.min(min, lenCondition ? tetherMax : tetherMin) : min,
       offset,
@@ -96,6 +97,7 @@ export function preventOverflow(state: State, options?: Options = {}) {
     const mainSide = mainAxis === 'x' ? top : left;
     const altSide = mainAxis === 'x' ? bottom : right;
 
+    // FIXME: find a proper API to modify these
     state.modifiersData.popperOffsets[altAxis] = within(
       popperOffsets[altAxis] + overflow[mainSide] + paddingObject[mainSide],
       popperOffsets[altAxis],

@@ -1,5 +1,10 @@
 // @flow
-import type { State, PositioningStrategy, Offsets, Modifier } from '../types';
+import type {
+  ModifierArguments,
+  PositioningStrategy,
+  Offsets,
+  Modifier,
+} from '../types';
 
 // This modifier takes the Popper state and prepares some StyleSheet properties
 // that can be applied to the popper element to make it render in the expected position.
@@ -69,22 +74,27 @@ export const computeArrowStyles = ({
   }
 };
 
-export function computeStyles(state: State, options?: Options = {}) {
+export function computeStyles({
+  state,
+  options = {},
+  getModifierData,
+  setOwnData,
+}: ModifierArguments<Options>) {
   const { gpuAcceleration = true } = options;
 
-  state.modifiersData.computeStyles = {
+  setOwnData({
     styles: {
       // popper offsets are always available
       popper: computePopperStyles({
-        offsets: state.modifiersData.popperOffsets,
+        offsets: getModifierData('popperOffsets'),
         strategy: state.options.strategy,
         gpuAcceleration,
       }),
       // arrow offsets may not be available
       arrow:
-        state.modifiersData.arrow != null
+        getModifierData('arrow') != null
           ? computeArrowStyles({
-              offsets: state.modifiersData.arrow,
+              offsets: getModifierData('arrow'),
               gpuAcceleration,
             })
           : undefined,
@@ -92,7 +102,7 @@ export function computeStyles(state: State, options?: Options = {}) {
     attributes: {
       popper: { 'data-popper-placement': state.placement },
     },
-  };
+  });
 
   return state;
 }

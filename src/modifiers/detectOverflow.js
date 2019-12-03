@@ -1,5 +1,5 @@
 // @flow
-import type { State, Modifier } from '../types';
+import type { ModifierArguments, Modifier } from '../types';
 import getBoundingClientRect from '../dom-utils/getBoundingClientRect';
 import getClippingParent from '../dom-utils/getClippingParent';
 import getDocumentRect from '../dom-utils/getDocumentRect';
@@ -20,12 +20,13 @@ type ModifierData = {
   left: number,
 };
 
-export function detectOverflow(
-  state: State,
-  options?: Options = {
+export function detectOverflow({
+  state,
+  options = {
     boundaryElement: getClippingParent(state.elements.popper),
-  }
-) {
+  },
+  setOwnData,
+}: ModifierArguments<Options>) {
   const popperElement = state.elements.popper;
   const referenceElement = state.elements.reference;
   const popperRect = state.measures.popper;
@@ -63,12 +64,14 @@ export function detectOverflow(
     ...popperOffsets,
   });
 
-  state.modifiersData.detectOverflow = ({
-    top: boundaryClientRect.top - popperClientRect.top,
-    bottom: popperClientRect.bottom - boundaryClientRect.bottom,
-    left: boundaryClientRect.left - popperClientRect.left,
-    right: popperClientRect.right - boundaryClientRect.right,
-  }: ModifierData);
+  setOwnData(
+    ({
+      top: boundaryClientRect.top - popperClientRect.top,
+      bottom: popperClientRect.bottom - boundaryClientRect.bottom,
+      left: boundaryClientRect.left - popperClientRect.left,
+      right: popperClientRect.right - boundaryClientRect.right,
+    }: ModifierData)
+  );
 
   return state;
 }

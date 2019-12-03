@@ -1,5 +1,5 @@
 // @flow
-import type { State, Modifier } from '../types';
+import type { Modifier, ModifierArguments } from '../types';
 import getBasePlacement from '../utils/getBasePlacement';
 import addClientRectMargins from '../dom-utils/addClientRectMargins';
 import getElementClientRect from '../dom-utils/getElementClientRect';
@@ -10,7 +10,12 @@ import within from '../utils/within';
 
 type Options = { element: HTMLElement | string };
 
-export function arrow(state: State, options?: Options = {}) {
+export function arrow({
+  state,
+  options = {},
+  getModifierData,
+  setOwnData,
+}: ModifierArguments<Options>) {
   let { element: arrowElement = '[data-popper-arrow]' } = options;
 
   // CSS selector
@@ -34,7 +39,7 @@ export function arrow(state: State, options?: Options = {}) {
 
   state.elements.arrow = arrowElement;
 
-  const popperOffsets = state.modifiersData.popperOffsets;
+  const popperOffsets = getModifierData('popperOffsets');
   const basePlacement = getBasePlacement(state.placement);
   const axis = getMainAxisFromPlacement(basePlacement);
   const isVertical = ['left', 'right'].includes(basePlacement);
@@ -83,7 +88,7 @@ export function arrow(state: State, options?: Options = {}) {
 
   // Prevents breaking syntax highlighting...
   const axisProp: string = axis;
-  state.modifiersData.arrow = { [axisProp]: center };
+  setOwnData({ [axisProp]: center });
 
   return state;
 }

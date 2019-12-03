@@ -1,6 +1,6 @@
 // @flow
 import type { Placement } from '../enums';
-import type { State, Modifier, Padding } from '../types';
+import type { ModifierArguments, Modifier, Padding } from '../types';
 import getOppositePlacement from '../utils/getOppositePlacement';
 import getBasePlacement from '../utils/getBasePlacement';
 import mergePaddingObject from '../utils/mergePaddingObject';
@@ -12,7 +12,12 @@ type Options = {
   padding: Padding,
 };
 
-export function flip(state: State, options?: Options = {}) {
+export function flip({
+  state,
+  options = {},
+  getModifierData,
+  setOwnData,
+}: ModifierArguments<Options>) {
   const placement = state.placement;
   const defaultFallbackPlacements = [
     getOppositePlacement(state.options.placement),
@@ -21,8 +26,8 @@ export function flip(state: State, options?: Options = {}) {
     fallbackPlacements = defaultFallbackPlacements,
     padding = 0,
   } = options;
-  const overflow = state.modifiersData.detectOverflow;
-  const flipIndex = state.modifiersData.flip.index;
+  const overflow = getModifierData('detectOverflow');
+  const flipIndex = getModifierData('flip').index;
 
   const paddingObject = mergePaddingObject(
     typeof padding !== 'number'
@@ -48,7 +53,7 @@ export function flip(state: State, options?: Options = {}) {
   const fits = overflow[basePlacement] + paddingObject[basePlacement] <= 0;
 
   if (!fits) {
-    state.modifiersData.flip.index += 1;
+    setOwnData({ index: getModifierData('flip').index + 1 });
     state.reset = true;
     return state;
   } else if (fits && state.placement !== flippedPlacement) {

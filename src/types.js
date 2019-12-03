@@ -51,14 +51,20 @@ export type State = {|
   reset: boolean,
 |};
 
+export type ModifierArguments<Options> = {
+  state: State,
+  options?: Options,
+  getModifierData: string => any,
+  setOwnData: <T>(T) => void,
+};
 export type Modifier<Options> = {|
   name: string,
   enabled: boolean,
   phase: ModifierPhases,
   requires?: Array<string>,
-  fn: (State, Options) => State,
-  onLoad?: State => void,
-  onDestroy?: State => void,
+  fn: (ModifierArguments<Options>) => State,
+  onLoad?: (ModifierArguments<Options>) => void,
+  onDestroy?: (ModifierArguments<Options>) => void,
   options?: any,
   data?: {},
 |};

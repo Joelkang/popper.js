@@ -95,7 +95,14 @@ export default class Popper {
     // defined by the modifier dependencies directive.
     // The `onLoad` function may add or alter the options of themselves
     this.state.orderedModifiers.forEach(
-      ({ onLoad, enabled }) => enabled && onLoad && onLoad(this.state)
+      ({ onLoad, enabled, name }) =>
+        enabled &&
+        onLoad &&
+        onLoad({
+          state: this.state,
+          getModifierData: name => this.getModifierData(name),
+          setOwnData: this.setModifierData(name),
+        })
     );
 
     this.update().then(() => {
@@ -176,10 +183,15 @@ export default class Popper {
         continue;
       }
 
-      const { fn, enabled, options } = this.state.orderedModifiers[index];
+      const { fn, enabled, options, name } = this.state.orderedModifiers[index];
 
       if (enabled && typeof fn === 'function') {
-        this.state = fn((this.state: State), options);
+        this.state = fn({
+          state: this.state,
+          options,
+          getModifierData: name => this.getModifierData(name),
+          setOwnData: this.setModifierData(name),
+        });
       }
     }
   }
@@ -213,6 +225,13 @@ export default class Popper {
     }
   }
 
+  getModifierData(name: string) {
+    return () => this.state.modifiersData[name];
+  }
+  setModifierData(name: string) {
+    return (data: any) => (this.state.modifiersData[name] = data);
+  }
+
   destroy() {
     // Remove scroll event listeners
     const scrollParents = [
@@ -230,7 +249,14 @@ export default class Popper {
 
     // Run `onDestroy` modifier methods
     this.state.orderedModifiers.forEach(
-      ({ onDestroy, enabled }) => enabled && onDestroy && onDestroy(this.state)
+      ({ onDestroy, enabled, name }) =>
+        enabled &&
+        onDestroy &&
+        onDestroy({
+          state: this.state,
+          getModifierData: name => this.getModifierData(name),
+          setOwnData: this.setModifierData(name),
+        })
     );
   }
 }
